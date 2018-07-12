@@ -4,9 +4,12 @@ import Immutable from 'seamless-immutable'
 /* ------------- Types and Action Creators ------------- */
 
 export const { Types, Creators } = createActions({
-  categoriesRequest: ['data'],
-  categoriesSuccess: ['data'],
-  categoriesFailure: ['err']
+  productsRequest: ['data'],
+  productsSuccess: ['data'],
+  productsFailure: ['err'],
+  productDetailRequest: ['data'],
+  productDetailSuccess: ['data'],
+  productDetailFailure: ['err']
 })
 
 /* ------------- Initial State ------------- */
@@ -23,6 +26,8 @@ const INITIAL_STATE = Immutable({
 const request = (state) => {
   return state.merge({
     isFetching: true,
+    isFound: false,
+    isFailure: false,
     message: null
   })
 }
@@ -39,14 +44,21 @@ const success = (state, { data }) => {
 const failure = (state, { err }) => {
   return state.merge({
     isFetching: false,
+    isFound: false,
     isFailure: true,
     ...err
   })
 }
 
 /* ------------- Hookup Reducers To Types ------------- */
-export default createReducer(INITIAL_STATE, {
-  [Types.CATEGORIES_SUCCESS]: success,
-  [Types.CATEGORIES_REQUEST]: request,
-  [Types.CATEGORIES_FAILURE]: failure
+export const productsReducer = createReducer(INITIAL_STATE, {
+  [Types.PRODUCTS_SUCCESS]: success,
+  [Types.PRODUCTS_REQUEST]: request,
+  [Types.PRODUCTS_FAILURE]: failure
+})
+
+export const productDetailReducer = createReducer(INITIAL_STATE, {
+  [Types.PRODUCT_DETAIL_SUCCESS]: success,
+  [Types.PRODUCT_DETAIL_REQUEST]: request,
+  [Types.PRODUCT_DETAIL_FAILURE]: failure
 })

@@ -1,7 +1,7 @@
 import { fork, all } from 'redux-saga/effects'
 import { login, logout } from './AuthSaga'
 import { getUser, addPhotoUser } from './UserSaga'
-import { categories } from './Categories'
+import { products, productDetail } from './Products'
 import API from '../services/Api'
 import getToken from '../services/GetToken'
 const api = API.create()
@@ -12,6 +12,7 @@ export default function * rootSaga () {
     fork(login, api),
     fork(getUser, api, getToken),
     fork(addPhotoUser, api, getToken),
-    fork(categories, api),
+    fork(products, api),
+    fork(productDetail, api)
   ])
 }

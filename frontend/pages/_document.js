@@ -8,7 +8,6 @@ class HomeDocument extends Document {
   }
 
   render () {
-    console.log('list', this.props.list)
     return (
       <html lang={this.props.__NEXT_DATA__.props.lang || 'en'}>
         <Head>
