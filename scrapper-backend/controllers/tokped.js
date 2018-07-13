@@ -1,11 +1,42 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const Json2csvParser = require('json2csv').Parser;
 const apiTokped = process.env.API_TOKPED
 const methods = {}
 
+methods.csvBL = function(req, response){
+  const { products, filename } = req.query
+  const fields = [
+    { label: 'Nama Barang', value: 'name' },
+    { label: 'Barang Stok(Minimum 1)', value: 'stock' },
+    { label: 'Berat (gram)', value: 'weight' },
+    { label: 'Harga (Rupiah)', value: 'price_sale' },
+    { label: 'Kondisi(Baru/Bekas)', value: 'condition' },
+    { label: 'Deskripsi', value: 'description' },
+    { label: 'Wajib Asuransi?(Ya/Tidak)', value: 'is_insurance' },
+    { label: 'Merek', value: 'merk' },
+    { label: 'Jasa Pengiriman (gunakan vertical bar | sebagai pemisah jasa pengiriman contoh: jner | jney)', value: 'expedition' },
+    { label: 'URL Gambar 1', value: 'image1' },
+    { label: 'URL Gambar 2', value: 'image2' },
+    { label: 'URL Gambar 3', value: 'image3' },
+    { label: 'URL Gambar 4', value: 'image4' },
+    { label: 'URL Gambar 5', value: 'image5' }
+  ]
+  let data = JSON.parse(products[0])
+  let data2 = [ data ]
+  const json2csvParser = new Json2csvParser({ fields, quote: '' });
+  const csv = json2csvParser.parse(data2);
+  response.set({
+    'Content-Disposition': `attachment; filename=${filename}.xls`,
+    'Content-Type': 'text/xls'
+  });
+  console.log('csv', csv)
+  response.send(csv);
+}
+
 methods.products = function(req, response){
-  const { referer, page, rows, ob } = req.query
-  let url = `${apiTokped}&page=${page}&rows=${rows}&ob=${ob}`
+  const { referer, sc, page, rows, ob } = req.query
+  let url = `${apiTokped}&page=${page}&rows=${rows}&sc=${sc}&ob=${ob}`
   let options = {
     url,
     headers: {
@@ -30,6 +61,7 @@ methods.detailProduct = function(req, response){
           reject(err);
         } else {
           let $ = cheerio.load(body);
+          // get images
           let images = []
           $('div.jcarousel.product-imagethumb-alt').each((i, value) => {
             $(value).find('ul').find('li').map((j, data) => {
@@ -37,6 +69,7 @@ methods.detailProduct = function(req, response){
               images.push(img)
             });
           });
+          // get weight & insurance
           let weight
           let is_insurance
           $('dl.clearfix.m-0').each((idx, val) => {
@@ -49,16 +82,45 @@ methods.detailProduct = function(req, response){
               }
             })
           });
-          let description = $('div.product-info-holder').find('p').html()
-          resolve({ id, weight, is_insurance, images, description })
+          // get expedition
+          let expedition = []
+          $('ul.product-ratingstat.mt-0.p-10').each((idx, val) => {
+            let expdt = $(val).html().trim()
+            if (/jne/.test(expdt)) {
+              expedition.push('jner')
+              expedition.push('jney')
+            }
+            if (/jnt/.test(expdt)) {
+              expedition.push('j&tr')
+            }
+            if (/ninja/.test(expdt)) {
+              expedition.push('ninjar')
+            }
+            if (/sicepat/.test(expdt)) {
+              expedition.push('sicepatr')
+            }
+            if (/tiki/.test(expdt)) {
+              expedition.push('tikir')
+            }
+            if (/wahana/.test(expdt)) {
+              expedition.push('wahana')
+            }
+            if (/pos/.test(expdt)) {
+              expedition.push('posk')
+            }
+          });
+          // get description
+          let description = $('div.product-info-holder').find('p').html().trim().replace(/&amp;/gm, '&').replace(/(\r\n|\n|\r|\s+|\t|&nbsp;)/gm,' ').replace(/\"/g, "\"\"").replace(/(,|;)/g, " ").replace(/(&quot;|&apos;)/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<a rel=""nofollow noopener noreferrer"" target=""_blank"" href=""/g, '').replace(/">/g, '');
+
+          resolve({ id, weight, is_insurance, images, expedition: expedition.join(' | '), description })
         }
       });
     });
   }
 
   requestget(req.query).then((data) => {
-    const { id, weight, is_insurance, images, description } = data
-    response.json({ data: { id, weight, is_insurance, images, description } })
+    const { id, weight, is_insurance, images, expedition, description } = data
+    response.json({ data: { id, weight, is_insurance, images, expedition, description } })
   });
 }
 

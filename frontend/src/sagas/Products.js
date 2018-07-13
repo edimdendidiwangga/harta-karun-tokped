@@ -27,3 +27,16 @@ export function * productDetailApi (api, { data }) {
     yield put(Actions.productDetailSuccess(res.data))
   }
 }
+
+export function * csv (api) {
+  yield baseListen(Types.CSV_REQUEST, csvApi, api)
+}
+
+export function * csvApi (api, { data }) {
+  const res = yield call(api.csv, data)
+  if (!res.ok) {
+    yield put(Actions.csvFailure(res.data))
+  } else {
+    yield put(Actions.csvSuccess(res.data))
+  }
+}

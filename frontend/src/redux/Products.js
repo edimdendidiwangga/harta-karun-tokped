@@ -9,7 +9,10 @@ export const { Types, Creators } = createActions({
   productsFailure: ['err'],
   productDetailRequest: ['data'],
   productDetailSuccess: ['data'],
-  productDetailFailure: ['err']
+  productDetailFailure: ['err'],
+  csvRequest: ['data'],
+  csvSuccess: ['data'],
+  csvFailure: ['err']
 })
 
 /* ------------- Initial State ------------- */
@@ -61,4 +64,10 @@ export const productDetailReducer = createReducer(INITIAL_STATE, {
   [Types.PRODUCT_DETAIL_SUCCESS]: success,
   [Types.PRODUCT_DETAIL_REQUEST]: request,
   [Types.PRODUCT_DETAIL_FAILURE]: failure
+})
+
+export const csvReducer = createReducer(INITIAL_STATE, {
+  [Types.CSV_SUCCESS]: success,
+  [Types.CSV_REQUEST]: request,
+  [Types.CSV_FAILURE]: failure
 })
