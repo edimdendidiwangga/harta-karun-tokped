@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import auth, { logoutReducer as logout } from './AuthRedux'
 import user, { photoUserReducer as photoUser} from './UserRedux'
-import { productsReducer as products, productDetailReducer as productDetail, csvReducer as csv } from './Products'
+import { productsReducer as products, productDetailReducer as productDetail, csvReducer as csv, variantReducer as variant } from './Products'
 
 export default combineReducers({
   auth,
@@ -10,5 +10,6 @@ export default combineReducers({
   photoUser,
   products,
   productDetail,
-  csv
+  csv,
+  variant
 })

@@ -35,8 +35,8 @@ methods.csvBL = function(req, response){
 }
 
 methods.products = function(req, response){
-  const { referer, sc, page, rows, ob } = req.query
-  let url = `${apiTokped}&page=${page}&rows=${rows}&sc=${sc}&ob=${ob}`
+  const { referer, sc, page, rows, ob, start } = req.query
+  let url = `${apiTokped}&page=${page}&rows=${rows}&sc=${sc}&ob=${ob}&start=${start}`
   let options = {
     url,
     headers: {
@@ -83,36 +83,14 @@ methods.detailProduct = function(req, response){
             })
           });
           // get expedition
-          let expedition = []
+          let expedition
           $('ul.product-ratingstat.mt-0.p-10').each((idx, val) => {
-            let expdt = $(val).html().trim()
-            if (/jne/.test(expdt)) {
-              expedition.push('jner')
-              expedition.push('jney')
-            }
-            if (/jnt/.test(expdt)) {
-              expedition.push('j&tr')
-            }
-            if (/ninja/.test(expdt)) {
-              expedition.push('ninjar')
-            }
-            if (/sicepat/.test(expdt)) {
-              expedition.push('sicepatr')
-            }
-            if (/tiki/.test(expdt)) {
-              expedition.push('tikir')
-            }
-            if (/wahana/.test(expdt)) {
-              expedition.push('wahana')
-            }
-            if (/pos/.test(expdt)) {
-              expedition.push('posk')
-            }
+            expedition = $(val).html().trim()
           });
           // get description
-          let description = $('div.product-info-holder').find('p').html().trim().replace(/&amp;/gm, '&').replace(/(\r\n|\n|\r|\s+|\t|&nbsp;)/gm,' ').replace(/\"/g, "\"\"").replace(/(,|;)/g, " ").replace(/(&quot;|&apos;)/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<a rel=""nofollow noopener noreferrer"" target=""_blank"" href=""/g, '').replace(/">/g, '');
-
-          resolve({ id, weight, is_insurance, images, expedition: expedition.join(' | '), description })
+          let description = $('div.product-info-holder').find('p').html().trim().replace(/&amp;/gm, '&').replace(/(\r\n|\n|\r|\s+|\t|&nbsp;)/gm, ' ').replace(/\"/g, "\"\"").replace(/,/g, "comma").replace(/(&quot;|&apos;)/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<a rel=""nofollow noopener noreferrer"" target=""_blank"" href=""/g, '').replace(/<a rel=""nofollow"" target=""_blank"" href=""/g, '').replace(/">/g, '');
+          // .replace(/</a>/g, '')
+          resolve({ id, weight, is_insurance, images, expedition, description })
         }
       });
     });
@@ -121,6 +99,25 @@ methods.detailProduct = function(req, response){
   requestget(req.query).then((data) => {
     const { id, weight, is_insurance, images, expedition, description } = data
     response.json({ data: { id, weight, is_insurance, images, expedition, description } })
+  });
+}
+
+methods.variant = function(req, response){
+  const { id, referer } = req.query
+  let url = `https://tome.tokopedia.com/v2/product/${id}/variant`
+  let options = {
+    url,
+    headers: {
+      referer
+    }
+  };
+
+  request.get(options, function callback(err, res, body) {
+    if (err && res.statusCode !== 200) throw err;
+      // parsing callback angular
+      // let list = JSON.parse(body.replace('angular.callbacks._0(', '').slice(0, -1));
+      let variant = JSON.parse(body)
+      response.json({ variant: variant.data })
   });
 }
 

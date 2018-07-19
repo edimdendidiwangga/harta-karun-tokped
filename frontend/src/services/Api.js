@@ -22,6 +22,7 @@ const create = (baseURL = apiURL) => {
 
   const products = (data) => api.get(`${baseURL}tokped`, { ...data }, referer(data.referer))
   const productDetail = (data) => api.get(`${baseURL}tokped/detail`, { ...data })
+  const variant = (data) => api.get(`${baseURL}tokped/variant`, { ...data }, referer(data.referer))
   const csv = (data) => api.get(`${baseURL}tokped/csvBL`, { ...data })
   // const login = (data) => api.post(`${baseURL}users/login`, {...data}, headerNoToken)
   // const logout = (token) => api.post(`${baseURL}users/logout?access_token=${token}`, {}, headerWithToken(token))
@@ -33,7 +34,8 @@ const create = (baseURL = apiURL) => {
   return {
     products,
     productDetail,
-    csv
+    csv,
+    variant
   }
 }
 

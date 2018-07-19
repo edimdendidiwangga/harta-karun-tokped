@@ -45,6 +45,7 @@
     "ramda": "^0.25.0",
     "react": "^16.2.0",
     "react-csv-creator": "^1.0.8",
+    "react-data-export": "^0.4.2",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.2",
     "reactstrap": "^6.2.0",

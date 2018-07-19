@@ -40,3 +40,16 @@ export function * csvApi (api, { data }) {
     yield put(Actions.csvSuccess(res.data))
   }
 }
+
+export function * variant (api) {
+  yield baseListen(Types.VARIANT_REQUEST, variantApi, api)
+}
+
+export function * variantApi (api, { data }) {
+  const res = yield call(api.variant, data)
+  if (!res.ok) {
+    yield put(Actions.variantFailure(res.data))
+  } else {
+    yield put(Actions.variantSuccess(res.data))
+  }
+}
